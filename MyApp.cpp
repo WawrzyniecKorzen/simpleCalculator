@@ -6,12 +6,12 @@ IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
 {
-	wxString title = "Calculator v0.1";
+	wxString title = "Simple Calculator";
 	Calculator* calculator = new Calculator(title);
 	calculator->Show(true);
 
 
-
+	calculator->display->HideNativeCaret();
 	return true;
 }
 
