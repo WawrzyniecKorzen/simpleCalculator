@@ -10,7 +10,7 @@ Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1
 	
 	SetBackgroundColour(wxColour(*wxWHITE));
 	sizer = new wxBoxSizer(wxVERTICAL);
-	display = new wxTextCtrl(this, wxID_ANY, "", wxPoint(-1, -1), wxSize(-1, -1), wxTE_RIGHT | wxTE_READONLY | wxTE_MULTILINE | wxTE_NO_VSCROLL | wxNO_BORDER);
+	display = new wxTextCtrl(this, wxID_ANY, "0", wxPoint(-1, -1), wxSize(-1, -1), wxTE_RIGHT | wxTE_READONLY | wxTE_MULTILINE | wxTE_NO_VSCROLL | wxNO_BORDER);
 
 	sizer->Add(display, 0, wxTOP | wxBOTTOM | wxRIGHT, 10);
 
@@ -126,12 +126,16 @@ void Calculator::DigitClicked(wxString digit)
 {
 	buffer.append(digit);
 	SetStatusText(buffer, 0);
+	displayedText = buffer;
+	display->SetLabelText(displayedText);
 }
 
 void Calculator::OnClear(wxCommandEvent& event)
 {
 	buffer.clear();
 	SetStatusText(buffer, 0);
+	displayedText.clear();
+	display->SetLabelText(displayedText);
 }
 
 void Calculator::OnInverse(wxCommandEvent& event)
@@ -213,7 +217,8 @@ void Calculator::OnSign(wxCommandEvent& event)
 
 void Calculator::OnZero(wxCommandEvent& event)
 {
-	DigitClicked("0");
+	if (!buffer.IsSameAs("0"))
+		DigitClicked("0");
 }
 
 void Calculator::OnDecimal(wxCommandEvent& event)

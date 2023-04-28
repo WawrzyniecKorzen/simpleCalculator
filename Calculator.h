@@ -7,6 +7,7 @@ public:
 	Calculator(wxString title);
 
 	wxString buffer;
+	wxString displayedText;
 
 	wxTextCtrl* display;
 	wxBoxSizer* sizer;
