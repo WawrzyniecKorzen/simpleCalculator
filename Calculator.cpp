@@ -44,7 +44,9 @@ Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1
 	grid->Add(buttonMultiply, 0);
 	buttonMultiply->Bind(wxEVT_BUTTON, &Calculator::OnMultiplication, this);
 
-	grid->Add(new wxStaticText(this, -1, ""), 0);
+	wxButton* buttonClearAll = new wxButton(this, wxID_ANY, "Clear All");
+	grid->Add(buttonClearAll, 0);
+	buttonClearAll->Bind(wxEVT_BUTTON, &Calculator::OnClear, this);
 
 	wxButton* button7 = new wxButton(this, wxID_ANY, "7");
 	grid->Add(button7, 0);
@@ -166,7 +168,8 @@ void Calculator::AdditiveOpClicked(wxString op)
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
 			{
-				//abort the operation -> clear buffer and so on
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
 				return;
 			}
 			temp = factor;
@@ -177,7 +180,8 @@ void Calculator::AdditiveOpClicked(wxString op)
 		{
 			if (!calculate(temp, pendingAdditionOperator))
 			{
-				//abort the operation -> clear buffer and so on
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
 				return;
 			}
 			
@@ -218,7 +222,8 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
 			{
-				//abort the operation
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
 				return;
 			}
 		}
@@ -262,15 +267,31 @@ wxString Calculator::DoubleToString(double number)
 	return temp;
 }
 
+void Calculator::clearAll()
+{
+	expectingOperand = true;
+	equalClicked = false;
+	sum = 0.0;
+	factor = 0.0;
+	pendingAdditionOperator.Clear();
+	pendingMultiplicationOperator.Clear();
+	buffer.Clear();
+	displayedText.Clear();
+	displayTop->SetLabelText("");
+	display->SetLabelText("0");
+}
+
 void Calculator::OnClear(wxCommandEvent& event)
 {
 	buffer.clear();
-	SetStatusText(buffer, 0);
-	displayedText.clear();
-	displayTop->SetLabelText(displayedText);
 	display->SetLabelText("0");
 	expectingOperand = true;
 	sum = 0;
+}
+
+void Calculator::OnClearAll(wxCommandEvent& event)
+{
+	clearAll();
 }
 
 void Calculator::OnInverse(wxCommandEvent& event)
@@ -285,6 +306,8 @@ void Calculator::OnInverse(wxCommandEvent& event)
 
 		if (sum == 0.0)
 		{
+			clearAll();
+			displayTop->SetLabelText("error: division by 0");
 			return;
 		}
 		else
@@ -300,6 +323,8 @@ void Calculator::OnInverse(wxCommandEvent& event)
 	{
 		if (result == 0.0)
 		{
+			clearAll();
+			displayTop->SetLabelText("error: division by 0");
 			return;
 		}
 		else
@@ -330,6 +355,8 @@ void Calculator::OnSqrt(wxCommandEvent& event)
 
 		if (sum < 0.0)
 		{
+			clearAll();
+			displayTop->SetLabelText("error: negative number under square root");
 			return;
 		}
 		else
@@ -345,7 +372,8 @@ void Calculator::OnSqrt(wxCommandEvent& event)
 	{
 		if (result < 0.0)
 		{
-
+			clearAll();
+			displayTop->SetLabelText("error: negative number under square root");
 			return;
 		}
 		else
@@ -495,7 +523,8 @@ void Calculator::OnEqual(wxCommandEvent& event)
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
 			{
-				//abort
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
 				return;
 			}
 			temp = factor;
@@ -507,7 +536,8 @@ void Calculator::OnEqual(wxCommandEvent& event)
 		{
 			if (!calculate(temp, pendingAdditionOperator))
 			{
-				//abort
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
 				return;
 			}
 			pendingAdditionOperator.Clear();

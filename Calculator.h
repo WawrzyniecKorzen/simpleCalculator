@@ -27,8 +27,10 @@ public:
 
 	bool calculate(double rightOperand, wxString& pendingOperator);
 	wxString DoubleToString(double number);
+	void clearAll();
 
 	void OnClear(wxCommandEvent& event);
+	void OnClearAll(wxCommandEvent& event);
 	void OnInverse(wxCommandEvent& event);
 	void OnPower(wxCommandEvent& event);
 	void OnSqrt(wxCommandEvent& event);
