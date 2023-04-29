@@ -155,7 +155,8 @@ void Calculator::AdditiveOpClicked(wxString op)
 	if (equalClicked)
 	{
 		displayedText.Clear();
-		displayTop->SetLabelText(DoubleToString(sum));
+		buffer = DoubleToString(sum);
+		displayTop->SetLabelText(buffer);
 		equalClicked = false;
 	}
 	double temp = 0;
@@ -206,7 +207,8 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 	if (equalClicked)
 	{
 		displayedText.Clear();
-		displayTop->SetLabelText(DoubleToString(sum));
+		buffer = DoubleToString(sum);
+		displayTop->SetLabelText(buffer);
 		equalClicked = false;
 	}
 	double temp = 0;
