@@ -145,10 +145,30 @@ void Calculator::AdditiveOpClicked(wxString op)
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
-		if (op == "+")
-			sum += temp;
-		else if (op == "-")
-			sum -= temp;
+		if (!pendingMultiplicationOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingMultiplicationOperator))
+			{
+				//abort the operation -> clear buffer and so on
+				return;
+			}
+			temp = factor;
+			factor = 0;
+			pendingMultiplicationOperator.Clear();
+		}
+		if (!pendingAdditionOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingAdditionOperator))
+			{
+				//abort the operation -> clear buffer and so on
+				return;
+			}
+			
+		}
+		else
+		{
+			sum = temp;
+		}
 
 		pendingAdditionOperator = op;
 		displayedText.append(buffer);
@@ -156,11 +176,51 @@ void Calculator::AdditiveOpClicked(wxString op)
 		displayedText.append(op);
 		displayedText.append(" ");
 		displayTop->SetLabelText(displayedText);
+
+		wxString result = "";
+		result << sum;
+		SetStatusText(result, 1);
 		expectingOperand = true;
 	}
-	else
-		SetStatusText("to double conversion error", 1);
+	
 
+}
+
+void Calculator::MultiplicativeOpClicked(wxString op)
+{
+	double temp = 0;
+	if (buffer.ToDouble(&temp))
+	{
+		if (!pendingMultiplicationOperator.IsEmpty())
+			if (!calculate(temp, pendingMultiplicationOperator))
+			{
+				//abort the operation
+				return;
+			}
+			else
+				factor = temp;
+		pendingMultiplicationOperator = op;
+		expectingOperand = true;
+	}
+}
+
+bool Calculator::calculate(double rightOperand, wxString& pendingOperator)
+{
+	if (pendingOperator == "+")
+		sum += rightOperand;
+	else if (pendingOperator == "-")
+		sum -= rightOperand;
+	else if (pendingOperator == "*")
+		factor *= rightOperand;
+	else if (pendingOperator == "/")
+	{
+		if (rightOperand == 0)
+			return false;
+
+		factor /= rightOperand;
+	}
+
+	return true;
 }
 
 void Calculator::OnClear(wxCommandEvent& event)
@@ -170,6 +230,8 @@ void Calculator::OnClear(wxCommandEvent& event)
 	displayedText.clear();
 	displayTop->SetLabelText(displayedText);
 	display->SetLabelText("0");
+	expectingOperand = true;
+	sum = 0;
 }
 
 void Calculator::OnInverse(wxCommandEvent& event)
@@ -267,4 +329,21 @@ void Calculator::OnDecimal(wxCommandEvent& event)
 
 void Calculator::OnEqual(wxCommandEvent& event)
 {
+	double temp = 0;
+	if (buffer.ToDouble(&temp))
+	{
+		if (!pendingMultiplicationOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingMultiplicationOperator))
+			{
+				//abort
+				return;
+			}
+			temp = factor;
+			factor = 0;
+			pendingMultiplicationOperator.Clear();
+		}
+
+		if(!pendingAdditionOperator.IsEmpty)
+	}
 }

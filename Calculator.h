@@ -22,6 +22,9 @@ public:
 
 	void DigitClicked(wxString digit);
 	void AdditiveOpClicked(wxString op);
+	void MultiplicativeOpClicked(wxString op);
+
+	bool calculate(double rightOperand, wxString& pendingOperator);
 
 	void OnClear(wxCommandEvent& event);
 	void OnInverse(wxCommandEvent& event);
