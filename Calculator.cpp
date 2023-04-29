@@ -7,6 +7,7 @@ Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1
 {
 	buffer.clear();
 	expectingOperand = true;
+	equalClicked = false;
 	displayedText = "";
 	
 	SetBackgroundColour(wxColour(*wxWHITE));
@@ -130,6 +131,14 @@ Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1
 
 void Calculator::DigitClicked(wxString digit)
 {
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(displayedText);
+		sum = 0.0;
+		equalClicked = false;
+	}
+
 	if (expectingOperand)
 	{
 		buffer.Clear();
@@ -142,6 +151,12 @@ void Calculator::DigitClicked(wxString digit)
 
 void Calculator::AdditiveOpClicked(wxString op)
 {
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+		equalClicked = false;
+	}
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
@@ -171,15 +186,11 @@ void Calculator::AdditiveOpClicked(wxString op)
 		}
 
 		pendingAdditionOperator = op;
-		displayedText.append(buffer);
-		displayedText.append(" ");
-		displayedText.append(op);
-		displayedText.append(" ");
+		displayedText = displayedText + buffer + " " + op + " ";
+
 		displayTop->SetLabelText(displayedText);
 
-		wxString result = "";
-		result << sum;
-		SetStatusText(result, 1);
+		SetStatusText(DoubleToString(sum), 1);
 		expectingOperand = true;
 	}
 	
@@ -188,6 +199,12 @@ void Calculator::AdditiveOpClicked(wxString op)
 
 void Calculator::MultiplicativeOpClicked(wxString op)
 {
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+		equalClicked = false;
+	}
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
@@ -204,10 +221,8 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 		pendingMultiplicationOperator = op;
 		expectingOperand = true;
 
-		displayedText.append(buffer);
-		displayedText.append(" ");
-		displayedText.append(op);
-		displayedText.append(" ");
+		displayedText = displayedText + buffer + " " + op + " ";
+
 		displayTop->SetLabelText(displayedText);
 	}
 }
@@ -231,6 +246,13 @@ bool Calculator::calculate(double rightOperand, wxString& pendingOperator)
 	return true;
 }
 
+wxString Calculator::DoubleToString(double number)
+{
+	wxString temp;
+	temp << number;
+	return temp;
+}
+
 void Calculator::OnClear(wxCommandEvent& event)
 {
 	buffer.clear();
@@ -244,6 +266,41 @@ void Calculator::OnClear(wxCommandEvent& event)
 
 void Calculator::OnInverse(wxCommandEvent& event)
 {
+	double result;
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+		equalClicked = false;
+		
+
+		if (sum == 0.0)
+		{
+			return;
+		}
+		else
+		{
+
+			sum = 1 / sum;
+			display->SetLabelText(DoubleToString(sum));
+			buffer = DoubleToString(sum);
+		}
+	}
+	
+	else if (buffer.ToDouble(&result))
+	{
+		if (result == 0.0)
+		{
+			return;
+		}
+		else
+		{
+
+			result = 1 / result;
+			display->SetLabelText(DoubleToString(result));
+			buffer = DoubleToString(result);
+		}
+	}
 }
 
 void Calculator::OnPower(wxCommandEvent& event)
@@ -339,6 +396,11 @@ void Calculator::OnDecimal(wxCommandEvent& event)
 
 void Calculator::OnEqual(wxCommandEvent& event)
 {
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+	}
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
@@ -366,13 +428,13 @@ void Calculator::OnEqual(wxCommandEvent& event)
 		else
 			sum = temp;
 
-		displayedText.append(buffer);
-		displayedText.append(" = ");
+		displayedText = displayedText + buffer + " = ";
 
 		buffer.Clear();
-		wxString result;
-		result << sum;
-		display->SetLabelText(result);
+		
+		display->SetLabelText(DoubleToString(sum));
 		displayTop->SetLabelText(displayedText);
+
+		equalClicked = true;
 	}
 }

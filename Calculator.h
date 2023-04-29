@@ -10,6 +10,7 @@ public:
 	wxString displayedText;
 
 	bool expectingOperand;
+	bool equalClicked;
 	double sum;
 	double factor;
 	wxString pendingAdditionOperator;
@@ -25,6 +26,7 @@ public:
 	void MultiplicativeOpClicked(wxString op);
 
 	bool calculate(double rightOperand, wxString& pendingOperator);
+	wxString DoubleToString(double number);
 
 	void OnClear(wxCommandEvent& event);
 	void OnInverse(wxCommandEvent& event);
