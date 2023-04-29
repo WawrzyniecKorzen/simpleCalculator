@@ -9,11 +9,19 @@ public:
 	wxString buffer;
 	wxString displayedText;
 
+	bool expectingOperand;
+	double sum;
+	double factor;
+	wxString pendingAdditionOperator;
+	wxString pendingMultiplicationOperator;
+
+	wxTextCtrl* displayTop;
 	wxTextCtrl* display;
 	wxBoxSizer* sizer;
 	wxGridSizer* grid;
 
 	void DigitClicked(wxString digit);
+	void AdditiveOpClicked(wxString op);
 
 	void OnClear(wxCommandEvent& event);
 	void OnInverse(wxCommandEvent& event);

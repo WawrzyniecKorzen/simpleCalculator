@@ -11,6 +11,7 @@ bool MyApp::OnInit()
 	calculator->Show(true);
 
 
+	calculator->displayTop->HideNativeCaret();
 	calculator->display->HideNativeCaret();
 	return true;
 }

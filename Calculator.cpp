@@ -3,15 +3,21 @@
 const int NUM_ROWS = 5;
 const int NUM_COLUMNS = 5;
 
-Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1), wxSize(480, 400))
+Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1), wxSize(420, 300))
 {
 	buffer.clear();
-	
+	expectingOperand = true;
+	displayedText = "";
 	
 	SetBackgroundColour(wxColour(*wxWHITE));
 	sizer = new wxBoxSizer(wxVERTICAL);
-	display = new wxTextCtrl(this, wxID_ANY, "0", wxPoint(-1, -1), wxSize(-1, -1), wxTE_RIGHT | wxTE_READONLY | wxTE_MULTILINE | wxTE_NO_VSCROLL | wxNO_BORDER);
 
+	displayTop = new wxTextCtrl(this, wxID_ANY, displayedText, wxPoint(-1, -1), wxSize(350, -1), wxTE_RIGHT | wxTE_READONLY  | wxTE_NO_VSCROLL | wxNO_BORDER);
+	displayTop->SetBackgroundColour(*wxWHITE);
+	sizer->Add(displayTop, 0, wxTOP | wxBOTTOM | wxRIGHT, 10);
+
+	display = new wxTextCtrl(this, wxID_ANY, "0", wxPoint(-1, -1), wxSize(400, -1), wxTE_RIGHT | wxTE_READONLY  | wxTE_NO_VSCROLL | wxNO_BORDER);
+	display->SetBackgroundColour(*wxWHITE);
 	sizer->Add(display, 0, wxTOP | wxBOTTOM | wxRIGHT, 10);
 
 	grid = new wxGridSizer(NUM_ROWS, NUM_COLUMNS, 5, 5);
@@ -118,16 +124,43 @@ Calculator::Calculator(wxString title) : wxFrame(NULL, -1, title, wxPoint(-1, -1
 	SetStatusText("Ready", 0);
 
 	SetMinSize(wxSize(420, 300));
-	SetMaxSize(wxSize(420, 300));
+	SetMaxSize(wxSize(420, 400));
 	Centre();
 }
 
 void Calculator::DigitClicked(wxString digit)
 {
+	if (expectingOperand)
+	{
+		buffer.Clear();
+		expectingOperand = false;
+	}
 	buffer.append(digit);
 	SetStatusText(buffer, 0);
-	displayedText = buffer;
-	display->SetLabelText(displayedText);
+	display->SetLabelText(buffer);
+}
+
+void Calculator::AdditiveOpClicked(wxString op)
+{
+	double temp = 0;
+	if (buffer.ToDouble(&temp))
+	{
+		if (op == "+")
+			sum += temp;
+		else if (op == "-")
+			sum -= temp;
+
+		pendingAdditionOperator = op;
+		displayedText.append(buffer);
+		displayedText.append(" ");
+		displayedText.append(op);
+		displayedText.append(" ");
+		displayTop->SetLabelText(displayedText);
+		expectingOperand = true;
+	}
+	else
+		SetStatusText("to double conversion error", 1);
+
 }
 
 void Calculator::OnClear(wxCommandEvent& event)
@@ -135,7 +168,8 @@ void Calculator::OnClear(wxCommandEvent& event)
 	buffer.clear();
 	SetStatusText(buffer, 0);
 	displayedText.clear();
-	display->SetLabelText(displayedText);
+	displayTop->SetLabelText(displayedText);
+	display->SetLabelText("0");
 }
 
 void Calculator::OnInverse(wxCommandEvent& event)
@@ -190,6 +224,7 @@ void Calculator::OnSix(wxCommandEvent& event)
 
 void Calculator::OnAddition(wxCommandEvent& event)
 {
+	AdditiveOpClicked("+");
 }
 
 void Calculator::OnOne(wxCommandEvent& event)
@@ -209,6 +244,7 @@ void Calculator::OnThree(wxCommandEvent& event)
 
 void Calculator::OnSubtraction(wxCommandEvent& event)
 {
+	AdditiveOpClicked("-");
 }
 
 void Calculator::OnSign(wxCommandEvent& event)
