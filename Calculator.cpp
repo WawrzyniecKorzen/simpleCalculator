@@ -1,4 +1,5 @@
 #include "Calculator.h"
+#include <cmath>
 
 const int NUM_ROWS = 5;
 const int NUM_COLUMNS = 5;
@@ -186,7 +187,10 @@ void Calculator::AdditiveOpClicked(wxString op)
 		}
 
 		pendingAdditionOperator = op;
-		displayedText = displayedText + buffer + " " + op + " ";
+		if (temp < 0)
+			displayedText = displayedText + "(" + buffer + ") " + op + " ";
+		else
+			displayedText = displayedText + buffer + " " + op + " ";
 
 		displayTop->SetLabelText(displayedText);
 
@@ -221,7 +225,10 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 		pendingMultiplicationOperator = op;
 		expectingOperand = true;
 
-		displayedText = displayedText + buffer + " " + op + " ";
+		if (temp < 0)
+			displayedText = displayedText +"("+ buffer + ") " + op + " ";
+		else
+			displayedText = displayedText + buffer + " " + op + " ";
 
 		displayTop->SetLabelText(displayedText);
 	}
@@ -305,10 +312,48 @@ void Calculator::OnInverse(wxCommandEvent& event)
 
 void Calculator::OnPower(wxCommandEvent& event)
 {
+
 }
 
 void Calculator::OnSqrt(wxCommandEvent& event)
 {
+
+	double result;
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+		equalClicked = false;
+
+
+		if (sum < 0.0)
+		{
+			return;
+		}
+		else
+		{
+
+			sum = sqrt(sum);
+			display->SetLabelText(DoubleToString(sum));
+			buffer = DoubleToString(sum);
+		}
+	}
+
+	else if (buffer.ToDouble(&result))
+	{
+		if (result < 0.0)
+		{
+
+			return;
+		}
+		else
+		{
+
+			result = sqrt(result);
+			display->SetLabelText(DoubleToString(result));
+			buffer = DoubleToString(result);
+		}
+	}
 }
 
 void Calculator::OnMultiplication(wxCommandEvent& event)
@@ -378,6 +423,46 @@ void Calculator::OnSubtraction(wxCommandEvent& event)
 
 void Calculator::OnSign(wxCommandEvent& event)
 {
+	double result;
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		displayTop->SetLabelText(DoubleToString(sum));
+		equalClicked = false;
+
+
+		if (sum == 0.0)
+		{
+			return;
+		}
+		else
+		{
+
+			sum *=-1;
+			display->SetLabelText(DoubleToString(sum));
+			buffer = DoubleToString(sum);
+		}
+	}
+
+	else if (buffer.ToDouble(&result))
+	{
+		if (result == 0.0)
+		{
+			return;
+		}
+		else
+		{
+
+			result *= -1;
+			buffer = DoubleToString(result);
+			if (result < 0)
+				display->SetLabelText("(" + DoubleToString(result) + ")");
+			else
+				display->SetLabelText(DoubleToString(result));
+
+			
+		}
+	}
 }
 
 void Calculator::OnZero(wxCommandEvent& event)
@@ -428,7 +513,11 @@ void Calculator::OnEqual(wxCommandEvent& event)
 		else
 			sum = temp;
 
-		displayedText = displayedText + buffer + " = ";
+		if (temp < 0)
+			displayedText = displayedText + "(" + buffer + ") = ";
+		else
+			displayedText = displayedText + buffer + " = ";
+
 
 		buffer.Clear();
 		
