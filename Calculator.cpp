@@ -191,16 +191,24 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
-		if (!pendingMultiplicationOperator.IsEmpty())
+		if (!pendingMultiplicationOperator.IsEmpty()) 
+		{
 			if (!calculate(temp, pendingMultiplicationOperator))
 			{
 				//abort the operation
 				return;
 			}
-			else
-				factor = temp;
+		}
+		else
+			factor = temp;
 		pendingMultiplicationOperator = op;
 		expectingOperand = true;
+
+		displayedText.append(buffer);
+		displayedText.append(" ");
+		displayedText.append(op);
+		displayedText.append(" ");
+		displayTop->SetLabelText(displayedText);
 	}
 }
 
@@ -248,6 +256,7 @@ void Calculator::OnSqrt(wxCommandEvent& event)
 
 void Calculator::OnMultiplication(wxCommandEvent& event)
 {
+	MultiplicativeOpClicked("*");
 }
 
 void Calculator::OnSeven(wxCommandEvent& event)
@@ -267,6 +276,7 @@ void Calculator::OnNine(wxCommandEvent& event)
 
 void Calculator::OnDivision(wxCommandEvent& event)
 {
+	MultiplicativeOpClicked("/");
 }
 
 void Calculator::OnFour(wxCommandEvent& event)
@@ -344,6 +354,25 @@ void Calculator::OnEqual(wxCommandEvent& event)
 			pendingMultiplicationOperator.Clear();
 		}
 
-		if(!pendingAdditionOperator.IsEmpty)
+		if (!pendingAdditionOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingAdditionOperator))
+			{
+				//abort
+				return;
+			}
+			pendingAdditionOperator.Clear();
+		}
+		else
+			sum = temp;
+
+		displayedText.append(buffer);
+		displayedText.append(" = ");
+
+		buffer.Clear();
+		wxString result;
+		result << sum;
+		display->SetLabelText(result);
+		displayTop->SetLabelText(displayedText);
 	}
 }
