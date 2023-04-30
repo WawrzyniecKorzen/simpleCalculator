@@ -388,7 +388,9 @@ void Calculator::OnSqrt(wxCommandEvent& event)
 
 void Calculator::OnMultiplication(wxCommandEvent& event)
 {
-	MultiplicativeOpClicked("*");
+	
+	if(!expectingOperand)
+		MultiplicativeOpClicked("*");
 }
 
 void Calculator::OnSeven(wxCommandEvent& event)
@@ -408,7 +410,8 @@ void Calculator::OnNine(wxCommandEvent& event)
 
 void Calculator::OnDivision(wxCommandEvent& event)
 {
-	MultiplicativeOpClicked("/");
+	if (!expectingOperand)
+		MultiplicativeOpClicked("/");
 }
 
 void Calculator::OnFour(wxCommandEvent& event)
@@ -428,7 +431,8 @@ void Calculator::OnSix(wxCommandEvent& event)
 
 void Calculator::OnAddition(wxCommandEvent& event)
 {
-	AdditiveOpClicked("+");
+	if (!expectingOperand)
+		AdditiveOpClicked("+");
 }
 
 void Calculator::OnOne(wxCommandEvent& event)
@@ -448,7 +452,8 @@ void Calculator::OnThree(wxCommandEvent& event)
 
 void Calculator::OnSubtraction(wxCommandEvent& event)
 {
-	AdditiveOpClicked("-");
+	if (!expectingOperand)
+		AdditiveOpClicked("-");
 }
 
 void Calculator::OnSign(wxCommandEvent& event)
@@ -517,9 +522,9 @@ void Calculator::OnEqual(wxCommandEvent& event)
 		displayTop->SetLabelText(DoubleToString(sum));
 	}
 	double temp = 0;
-	if (buffer.ToDouble(&temp))
+	if (buffer.ToDouble(&temp) && !expectingOperand)
 	{
-		if (!pendingMultiplicationOperator.IsEmpty())
+		if (!pendingMultiplicationOperator.IsEmpty() )
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
 			{
