@@ -164,6 +164,20 @@ void Calculator::AdditiveOpClicked(wxString op)
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
+		if (!pendingPowerOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingPowerOperator))
+			{
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
+				return;
+			}
+			temp = power;
+			power = 0;
+			pendingPowerOperator.Clear();
+
+		}
+		
 		if (!pendingMultiplicationOperator.IsEmpty())
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
@@ -218,6 +232,20 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 	double temp = 0;
 	if (buffer.ToDouble(&temp))
 	{
+		if (!pendingPowerOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingPowerOperator))
+			{
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
+				return;
+			}
+			temp = power;
+			power = 0;
+			pendingPowerOperator.Clear();
+
+		}
+		
 		if (!pendingMultiplicationOperator.IsEmpty()) 
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))
@@ -243,7 +271,9 @@ void Calculator::MultiplicativeOpClicked(wxString op)
 
 bool Calculator::calculate(double rightOperand, wxString& pendingOperator)
 {
-	if (pendingOperator == "+")
+	if (pendingOperator == "^")
+		power = std::pow(power, rightOperand);
+	else if (pendingOperator == "+")
 		sum += rightOperand;
 	else if (pendingOperator == "-")
 		sum -= rightOperand;
@@ -339,7 +369,38 @@ void Calculator::OnInverse(wxCommandEvent& event)
 
 void Calculator::OnPower(wxCommandEvent& event)
 {
+	if (equalClicked)
+	{
+		displayedText.Clear();
+		buffer = DoubleToString(sum);
+		displayTop->SetLabelText(buffer);
+		equalClicked = false;
+	}
+	double temp = 0;
+	if (buffer.ToDouble(&temp) && !expectingOperand)
+	{
+		if (!pendingPowerOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingPowerOperator))
+			{
+				clearAll();
+				displayTop->SetLabelText("error: wrong operation");
+				return;
+			}
+		}
+		else
+			power = temp;
+		pendingPowerOperator = "^";
+		expectingOperand = true;
 
+		if (temp < 0)
+			displayedText = displayedText + "(" + buffer + ")^";
+		else
+			displayedText = displayedText + buffer + "^";
+
+		displayTop->SetLabelText(displayedText);
+	}
+	
 }
 
 void Calculator::OnSqrt(wxCommandEvent& event)
@@ -524,6 +585,18 @@ void Calculator::OnEqual(wxCommandEvent& event)
 	double temp = 0;
 	if (buffer.ToDouble(&temp) && !expectingOperand)
 	{
+		if (!pendingPowerOperator.IsEmpty())
+		{
+			if (!calculate(temp, pendingPowerOperator))
+			{
+				return;
+			}
+			temp = power;
+			power = 0;
+			pendingPowerOperator.Clear();
+
+		}
+		
 		if (!pendingMultiplicationOperator.IsEmpty() )
 		{
 			if (!calculate(temp, pendingMultiplicationOperator))

@@ -13,8 +13,10 @@ public:
 	bool equalClicked;
 	double sum;
 	double factor;
+	double power;
 	wxString pendingAdditionOperator;
 	wxString pendingMultiplicationOperator;
+	wxString pendingPowerOperator;
 
 	wxTextCtrl* displayTop;
 	wxTextCtrl* display;
